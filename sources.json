@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-11-13T17:36:56.779Z",
+  "sources": [
+    {
+      "id": "dgft-notification",
+      "url": "https://www.dgft.gov.in/CP/?opt=notification",
+      "lastRunAt": "2026-11-13T17:26:01.328Z",
+      "lastFound": 0,
+      "lastAdded": 0,
+      "lastError": "HTTP 403 for https://www.dgft.gov.in/CP/?opt=notification"
+    },
+    {
+      "id": "dgft-public-notice",
+      "url": "https://www.dgft.gov.in/CP/?opt=public-notice",
+      "lastRunAt": "2026-11-13T17:26:01.328Z",
+      "lastFound": 0,
+      "lastAdded": 0,
+      "lastError": "HTTP 403 for https://www.dgft.gov.in/CP/?opt=public-notice"
+    },
+    {
+      "id": "dgft-circular",
+      "url": "https://www.dgft.gov.in/CP/?opt=circular",
+      "lastRunAt": "2026-11-13T17:26:01.328Z",
+      "lastFound": 0,
+      "lastAdded": 0,
+      "lastError": "HTTP 403 for https://www.dgft.gov.in/CP/?opt=circular"
+    },
+    {
+      "id": "dgft-trade-notice",
+      "url": "https://www.dgft.gov.in/CP/?opt=trade-notice",
+      "lastRunAt": "2026-11-13T17:26:01.328Z",
+      "lastFound": 0,
+      "lastAdded": 0,
+      "lastError": "HTTP 403 for https://www.dgft.gov.in/CP/?opt=trade-notice"
+    },
+    {
+      "id": "gstc-cgst-tax-notification",
+      "url": "https://www.gstcouncil.gov.in/cgst-tax-notification",
+      "lastRunAt": "2026-11-13T17:26:01.328Z",
+      "lastFound": 10,
+      "lastAdded": 10,
+      "lastError": null,
+      "lastOkAt": "2026-11-13T17:26:01.328Z"
+    },
+    {
+      "id": "gstc-cgst-rate-notification",
+      "url": "https://www.gstcouncil.gov.in/cgst-rate-notification",
+      "lastRunAt": "2026-11-13T17:26:01.328Z",
+      "lastFound": 10,
+      "lastAdded": 10,
+      "lastError": null,
+      "lastOkAt": "2026-11-13T17:26:01.328Z"
+    },
+    {
+      "id": "gstc-cgst-circular",
+      "url": "https://www.gstcouncil.gov.in/cgst-circulars",
+      "lastRunAt": "2026-11-13T17:26:01.328Z",
+      "lastFound": 9,
+      "lastAdded": 9,
+      "lastError": null,
+      "lastOkAt": "2026-11-13T17:26:01.328Z"
+    },
+    {
+      "id": "gstc-press-release",
+      "url": "https://www.gstcouncil.gov.in/press-release",
+      "lastRunAt": "2026-11-13T17:26:01.328Z",
+      "lastFound": 1,
+      "lastAdded": 1,
+      "lastError": null,
+      "lastOkAt": "2026-11-13T17:26:01.328Z"
+    }
+  ]
+}
