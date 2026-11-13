@@ -1,4 +1,4 @@
-package `in`.easygst.easy_gst
+package com.easygst.app
 
 import io.flutter.embedding.android.FlutterActivity
 
