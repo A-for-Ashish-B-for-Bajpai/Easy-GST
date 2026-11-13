@@ -6,7 +6,10 @@ on:
   workflow_dispatch: {}
   push:
     branches: [main]
-    paths: ["app/**"]
+    paths: ["app/**", ".github/workflows/build-apk.yml"]
+  # Also build on pull requests, so a change that breaks the Android build is caught before merging.
+  pull_request:
+    paths: ["app/**", ".github/workflows/build-apk.yml"]
 
 jobs:
   apk:
@@ -17,7 +20,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.50.0
