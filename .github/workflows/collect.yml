@@ -1,0 +1,60 @@
+name: Collect updates
+
+# Free: GitHub Actions minutes are free for public repositories.
+on:
+  schedule:
+    - cron: "17 0,6,12,18 * * *" # every 6 hours (UTC), slightly off the hour to avoid GitHub's busiest minute
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the data branch (create it on the first run)
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --depth 1 origin data
+            git worktree add -B data data-branch origin/data
+          else
+            git worktree add --orphan -b data data-branch
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: collector/package-lock.json
+
+      - name: Collect and summarise
+        working-directory: collector
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          MAX_SUMMARIES_PER_RUN: ${{ vars.MAX_SUMMARIES_PER_RUN || '12' }}
+          DATA_DIR: ../data-branch
+        run: |
+          npm ci
+          npm run collect
+
+      - name: Save data
+        working-directory: data-branch
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Update data $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push origin data
