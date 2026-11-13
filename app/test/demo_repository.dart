@@ -1,23 +1,22 @@
-import '../models/tax_update.dart';
-import 'repository.dart';
+import 'package:easy_gst/data/repository.dart';
+import 'package:easy_gst/models/tax_update.dart';
 
-/// Used before Firebase is set up, and in tests. Shows real recent titles
-/// from DGFT and the GST Council (taken 2026-11-13), without AI summaries,
-/// so the screens can be tried. Chat is off in this mode.
+/// Fake repository for tests, with real titles from DGFT and the GST Council
+/// (taken 2026-11-13).
 class DemoRepository implements UpdatesRepository {
   DemoRepository({List<TaxUpdate>? items}) : _items = items ?? sampleUpdates;
 
   final List<TaxUpdate> _items;
-  final reports = <String>[];
-  final followed = <String>{};
+  String? lastKey;
+  AskResult? answer;
 
   @override
-  bool get isPreview => true;
-
-  @override
-  Stream<List<TaxUpdate>> feed({String? topic, int limit = 50}) => Stream.value(
-        _items.where((u) => topic == null || u.topics.contains(topic)).take(limit).toList(),
+  Stream<List<TaxUpdate>> feed({String? topic}) => Stream.value(
+        _items.where((u) => topic == null || u.topics.contains(topic)).toList(),
       );
+
+  @override
+  Future<void> refresh() async {}
 
   @override
   Future<TaxUpdate?> byId(String id) async {
@@ -28,18 +27,10 @@ class DemoRepository implements UpdatesRepository {
   }
 
   @override
-  Future<AskResult> ask(String question, {required String language}) async {
-    throw AskException('Chat with Gemini turns on once the app is connected to its Firebase backend.');
-  }
-
-  @override
-  Future<void> report({required String kind, required String targetId, String? question, String? answer}) async {
-    reports.add('$kind:$targetId');
-  }
-
-  @override
-  Future<void> setFollowing(String topicId, bool follow) async {
-    follow ? followed.add(topicId) : followed.remove(topicId);
+  Future<AskResult> ask(String question, {required String language, required String apiKey}) async {
+    lastKey = apiKey;
+    if (apiKey.isEmpty) throw AskException('Add your free Gemini API key in Settings to use the chat.');
+    return answer ?? const AskResult(answer: 'No answer', confident: false, sources: []);
   }
 }
 

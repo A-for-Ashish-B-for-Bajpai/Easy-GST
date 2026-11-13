@@ -2,7 +2,7 @@
  * Fetches every source live and prints what the parser finds, without
  * touching Firestore or Gemini. Run with: npm run collect:dry
  */
-import { httpFetcher } from "../collect.js";
+import { httpFetchHtml as httpFetcher } from "../pipeline.js";
 import { parseListing } from "../parse.js";
 import { SOURCES } from "../sources.js";
 

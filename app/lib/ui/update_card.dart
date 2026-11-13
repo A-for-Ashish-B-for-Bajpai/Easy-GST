@@ -30,7 +30,17 @@ class UpdateCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(meta, style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary)),
+              Row(
+                children: [
+                  Expanded(child: Text(meta, style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary))),
+                  if (settings.isNew(update.firstSeenOn))
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(color: theme.colorScheme.primary, borderRadius: BorderRadius.circular(8)),
+                      child: Text('New', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onPrimary)),
+                    ),
+                ],
+              ),
               const SizedBox(height: 6),
               Text(update.displayTitle, style: theme.textTheme.titleMedium, maxLines: 3, overflow: TextOverflow.ellipsis),
               if (summary.isNotEmpty) ...[

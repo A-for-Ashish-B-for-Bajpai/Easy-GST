@@ -76,12 +76,7 @@ class UpdateDetailScreen extends StatelessWidget {
                   Text(update.whoIsAffected!, style: theme.textTheme.bodyLarge),
                 ],
                 const SizedBox(height: 12),
-                AiNotice(onReport: () async {
-                  await scope.repo.report(kind: 'summary', targetId: update.id);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Thanks. We will check this summary.')));
-                  }
-                }),
+                const AiNotice(),
               ] else
                 Text('A plain-language summary is not ready yet. Please read the official document below.',
                     style: theme.textTheme.bodyLarge),

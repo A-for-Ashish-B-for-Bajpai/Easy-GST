@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 /// One official notification, circular or notice, with Gemini's plain summary
-/// when it is ready. Mirrors `updates/{id}` written by the backend.
+/// when it is ready. Mirrors one entry of `updates.json` written by the collector.
 class TaxUpdate {
   const TaxUpdate({
     required this.id,
@@ -19,6 +17,7 @@ class TaxUpdate {
     this.summaryEn = const [],
     this.summaryHi = const [],
     this.whoIsAffected,
+    this.firstSeenOn,
   });
 
   final String id;
@@ -36,6 +35,9 @@ class TaxUpdate {
   final List<String> summaryEn;
   final List<String> summaryHi;
   final String? whoIsAffected;
+
+  /// Day the collector first saw it (India date).
+  final DateTime? firstSeenOn;
 
   bool get hasSummary => summaryEn.isNotEmpty;
 
@@ -68,13 +70,11 @@ class TaxUpdate {
         summaryEn: _strings(d['summaryEn']),
         summaryHi: _strings(d['summaryHi']),
         whoIsAffected: d['whoIsAffected'] as String?,
+        firstSeenOn: _date(d['firstSeenOn']),
       );
-
-  factory TaxUpdate.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) =>
-      TaxUpdate.fromMap(doc.id, doc.data() ?? const {});
 }
 
-/// Topics people can follow. Ids match the backend and FCM topics `topic-<id>`.
+/// Feed filters. Ids match `topics` in the collector's sources.
 class Topic {
   const Topic(this.id, this.label, this.labelHi);
   final String id;
@@ -96,19 +96,13 @@ class AskSource {
   final String pdfUrl;
   final String? number;
 
-  factory AskSource.fromMap(Map<Object?, Object?> m) => AskSource(
-        id: m['id'] as String? ?? '',
-        title: m['title'] as String? ?? '',
-        authority: m['authority'] as String? ?? '',
-        pdfUrl: m['pdfUrl'] as String? ?? '',
-        number: m['number'] as String?,
-      );
+  factory AskSource.fromUpdate(TaxUpdate u) =>
+      AskSource(id: u.id, title: u.displayTitle, authority: u.authority, pdfUrl: u.pdfUrl, number: u.number);
 }
 
 class AskResult {
-  const AskResult({required this.answer, required this.confident, required this.sources, this.remainingToday});
+  const AskResult({required this.answer, required this.confident, required this.sources});
   final String answer;
   final bool confident;
   final List<AskSource> sources;
-  final int? remainingToday;
 }

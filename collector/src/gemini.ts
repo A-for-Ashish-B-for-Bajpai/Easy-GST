@@ -2,22 +2,34 @@ import { GoogleGenAI } from "@google/genai";
 import type { Summary } from "./types.js";
 
 /**
- * Gemini runs through Vertex AI using the Cloud Functions service account,
- * so there is no API key to store or leak. Model names are config so we can
- * move to a newer model without an app release.
+ * Gemini through the free tier of the Gemini API (Google AI Studio key).
+ * The key comes from the GEMINI_API_KEY secret in GitHub Actions and is never
+ * written to the repository. Model names are config so a newer model, or one
+ * with a bigger free quota, can be used without code changes.
  */
-export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash";
-export const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "gemini-embedding-001";
-export const EMBEDDING_DIMENSIONS = 768;
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+export const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL || "gemini-embedding-001";
+/** Small vectors keep chat-index.json small enough for a phone to download. */
+export const EMBEDDING_DIMENSIONS = 256;
 
 let client: GoogleGenAI | undefined;
 function ai(): GoogleGenAI {
-  client ??= new GoogleGenAI({
-    vertexai: true,
-    project: process.env.GCLOUD_PROJECT ?? process.env.GOOGLE_CLOUD_PROJECT,
-    location: process.env.GEMINI_LOCATION ?? "global",
-  });
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
+  client ??= new GoogleGenAI({ apiKey });
   return client;
+}
+
+/** True when Gemini refused because the free quota for now is used up. */
+export function isQuotaError(err: unknown): boolean {
+  const e = err as { status?: number; message?: string } | undefined;
+  return e?.status === 429 || /RESOURCE_EXHAUSTED|quota|rate limit/i.test(e?.message ?? "");
+}
+
+/** Scales a vector to length 1, so a dot product is the cosine similarity. Rounded to keep files small. */
+export function normalise(v: number[]): number[] {
+  const len = Math.hypot(...v) || 1;
+  return v.map((x) => Math.round((x / len) * 10_000) / 10_000);
 }
 
 const SUMMARY_INSTRUCTION = `You explain Indian government tax and trade documents to ordinary people
@@ -84,63 +96,5 @@ export async function embed(text: string, kind: "document" | "query"): Promise<n
   });
   const values = res.embeddings?.[0]?.values;
   if (!values?.length) throw new Error("Gemini returned no embedding");
-  return values;
-}
-
-export interface Context {
-  id: string;
-  label: string;
-  text: string;
-}
-
-export interface Answer {
-  answer: string;
-  usedSourceIds: string[];
-  confident: boolean;
-}
-
-const ANSWER_INSTRUCTION = `You are Easy-GST, a helper that explains Indian GST, customs and foreign trade rules
-to the general public in simple language.
-Rules:
-- Answer ONLY from the official documents provided. If they do not cover the question, say you are not sure
-  and suggest checking the official website or a tax professional. Set confident=false in that case.
-- Only answer questions about Indian tax, GST, customs, foreign trade or company law. Politely decline anything else.
-- Never give personal tax or legal advice; give general information.
-- Keep answers under 150 words. Mention document numbers you relied on.
-- List the ids of the documents you actually used in usedSourceIds.
-- Write the answer in the language requested.`;
-
-const ANSWER_SCHEMA = {
-  type: "object",
-  properties: {
-    answer: { type: "string" },
-    usedSourceIds: { type: "array", items: { type: "string" } },
-    confident: { type: "boolean" },
-  },
-  required: ["answer", "usedSourceIds", "confident"],
-};
-
-export async function answerQuestion(question: string, language: "en" | "hi", contexts: Context[]): Promise<Answer> {
-  const docs = contexts.map((c) => `<document id="${c.id}" label="${c.label.replace(/"/g, "'")}">\n${c.text}\n</document>`).join("\n\n");
-  const res = await ai().models.generateContent({
-    model: GEMINI_MODEL,
-    contents: [{
-      role: "user",
-      parts: [{ text: `Official documents:\n${docs || "(none found)"}\n\nLanguage: ${language === "hi" ? "Hindi" : "English"}\n\nQuestion: ${question}` }],
-    }],
-    config: {
-      systemInstruction: ANSWER_INSTRUCTION,
-      responseMimeType: "application/json",
-      responseJsonSchema: ANSWER_SCHEMA,
-      temperature: 0.2,
-    },
-  });
-  if (!res.text) throw new Error("Gemini returned no text");
-  const raw = JSON.parse(res.text) as Partial<Answer>;
-  const known = new Set(contexts.map((c) => c.id));
-  return {
-    answer: String(raw.answer ?? "").trim(),
-    usedSourceIds: (raw.usedSourceIds ?? []).filter((id) => known.has(id)),
-    confident: raw.confident === true,
-  };
+  return normalise(values);
 }

@@ -48,11 +48,19 @@ class _FeedScreenState extends State<FeedScreen> {
                 }
                 if (!snap.hasData) return const Center(child: CircularProgressIndicator());
                 final items = snap.data!;
-                if (items.isEmpty) return const _Message('No updates yet for this topic.');
-                return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  itemCount: items.length,
-                  itemBuilder: (context, i) => UpdateCard(update: items[i]),
+                if (items.isEmpty) return const _Message('No updates yet for this topic. The collector checks the official sites every 6 hours.');
+                return RefreshIndicator(
+                  onRefresh: () => scope.repo.refresh().catchError((_) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(const SnackBar(content: Text('Could not refresh. Showing the saved copy.')));
+                    }
+                  }),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    itemCount: items.length,
+                    itemBuilder: (context, i) => UpdateCard(update: items[i]),
+                  ),
                 );
               },
             ),

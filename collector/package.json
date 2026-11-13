@@ -1,23 +1,20 @@
 {
-  "name": "easy-gst-functions",
+  "name": "easy-gst-collector",
   "private": true,
   "type": "module",
-  "main": "lib/index.js",
+  "main": "lib/run.js",
   "engines": {
     "node": "22"
   },
   "scripts": {
     "build": "tsc",
     "test": "tsc -p tsconfig.test.json && node --test lib-test/test/*.test.js",
-    "lint": "tsc --noEmit",
-    "collect:dry": "npm run build && node lib/cli/dryRun.js",
-    "deploy": "firebase deploy --only functions"
+    "collect": "npm run build && node lib/run.js",
+    "collect:dry": "npm run build && node lib/cli/dryRun.js"
   },
   "dependencies": {
     "@google/genai": "^3.3.0",
     "cheerio": "^1.2.0",
-    "firebase-admin": "^14.5.1",
-    "firebase-functions": "^7.4.0",
     "unpdf": "^2.1.0"
   },
   "devDependencies": {

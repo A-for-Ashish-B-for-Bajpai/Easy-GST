@@ -1,9 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
-import '../app.dart';
 import 'ask_screen.dart';
 import 'calendar_screen.dart';
-import 'common.dart';
 import 'feed_screen.dart';
 import 'saved_screen.dart';
 import 'settings_screen.dart';
@@ -17,40 +15,10 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _tab = 0;
-  bool _noticeScheduled = false;
-
   static const _titles = ['Updates', 'Ask a tax question', 'Due dates', 'Saved'];
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final settings = AppScope.of(context).settings;
-    if (!settings.seenNotice && !_noticeScheduled) {
-      _noticeScheduled = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) => _showNotice());
-    }
-  }
-
-  Future<void> _showNotice() async {
-    if (!mounted) return;
-    final settings = AppScope.of(context).settings;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Welcome to Easy-GST'),
-        content: const Text('$notAffiliatedText\n\nSummaries and answers are written by Google Gemini and can contain mistakes.'),
-        actions: [
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('I understand')),
-        ],
-      ),
-    );
-    await settings.markNoticeSeen();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final repo = AppScope.of(context).repo;
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_tab]),
@@ -62,16 +30,9 @@ class _HomeShellState extends State<HomeShell> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          if (repo.isPreview) const PreviewBanner(),
-          Expanded(
-            child: IndexedStack(
-              index: _tab,
-              children: const [FeedScreen(), AskScreen(), CalendarScreen(), SavedScreen()],
-            ),
-          ),
-        ],
+      body: IndexedStack(
+        index: _tab,
+        children: const [FeedScreen(), AskScreen(), CalendarScreen(), SavedScreen()],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,

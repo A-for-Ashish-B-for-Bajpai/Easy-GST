@@ -14,8 +14,7 @@ Future<void> openLink(BuildContext context, String url) async {
 
 /// Shown under every AI summary and answer.
 class AiNotice extends StatelessWidget {
-  const AiNotice({super.key, this.onReport});
-  final VoidCallback? onReport;
+  const AiNotice({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,32 +30,7 @@ class AiNotice extends StatelessWidget {
             style: style,
           ),
         ),
-        if (onReport != null)
-          TextButton(onPressed: onReport, child: const Text('Report')),
       ],
-    );
-  }
-}
-
-const notAffiliatedText =
-    'Easy-GST is an independent app. It is not made by, or connected to, the Government of India, CBIC, the GST Council, GSTN, DGFT or MCA. '
-    'Every update links to its official source on the government website.';
-
-class PreviewBanner extends StatelessWidget {
-  const PreviewBanner({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Material(
-      color: scheme.tertiaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Text(
-          'Preview mode: sample updates only. Connect Firebase to get live updates and Gemini.',
-          style: TextStyle(color: scheme.onTertiaryContainer),
-        ),
-      ),
     );
   }
 }

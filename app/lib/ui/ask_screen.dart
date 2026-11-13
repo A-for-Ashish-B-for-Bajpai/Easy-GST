@@ -49,7 +49,7 @@ class _AskScreenState extends State<AskScreen> {
       _controller.clear();
     });
     try {
-      turn.result = await scope.repo.ask(question, language: scope.settings.language);
+      turn.result = await scope.repo.ask(question, language: scope.settings.language, apiKey: scope.settings.geminiKey);
     } on AskException catch (e) {
       turn.error = e.message;
     } catch (_) {
@@ -135,7 +135,6 @@ class _TurnView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final scope = AppScope.of(context);
     final result = turn.result;
 
     return Padding(
@@ -183,14 +182,7 @@ class _TurnView extends StatelessWidget {
                         ),
                     ],
                     const SizedBox(height: 8),
-                    AiNotice(onReport: () async {
-                      await scope.repo.report(kind: 'answer', targetId: 'chat', question: turn.question, answer: result.answer);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Thanks. We will check this answer.')));
-                      }
-                    }),
-                    if (result.remainingToday != null)
-                      Text('${result.remainingToday} questions left today', style: theme.textTheme.bodySmall),
+                    const AiNotice(),
                   ],
                 ),
               ),
