@@ -26,7 +26,7 @@
     "attempts": 2
   },
   "42176733a90b7e478c36": {
-    "attempts": 1,
+    "attempts": 2,
     "error": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
   },
   "b708601414e48956fc9a": {
