@@ -20,12 +20,10 @@
     "error": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
   },
   "04763963363c2aeda7dd": {
-    "attempts": 2,
-    "error": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+    "attempts": 2
   },
   "cdbec82181fd7f6d4ccd": {
-    "attempts": 2,
-    "error": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+    "attempts": 2
   },
   "42176733a90b7e478c36": {
     "attempts": 1,
